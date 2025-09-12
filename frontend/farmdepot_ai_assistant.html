@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FarmDepot AI Assistant</title>
+    <!-- Using Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the widget */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        #ai-widget-fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            transition: all 0.3s ease-in-out;
+        }
+
+        #ai-widget-modal {
+            position: fixed;
+            bottom: 6rem;
+            right: 2rem;
+            z-index: 1000;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        /* Hide scrollbar but allow scrolling */
+        #chat-log {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* IE and Edge */
+        }
+        #chat-log::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, and Opera */
+        }
+        
+        .mic-listening {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- This is a dummy page content to demonstrate the widget's position -->
+    <div class="container mx-auto p-8">
+        <h1 class="text-4xl font-bold text-gray-800">Welcome to FarmDepot.ng</h1>
+        <p class="mt-4 text-lg text-gray-600">Your one-stop shop for all agricultural needs. Our new AI assistant is in the bottom right corner to help you.</p>
+        
+        <div class="mt-8 bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold">Simulated Listing Form</h2>
+            <p class="text-gray-500 mb-4">The AI can help you fill this form out.</p>
+            <div class="space-y-4">
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700">Product Title</label>
+                    <input type="text" name="title" id="title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm" placeholder="e.g., Fresh Bags of Maize">
+                </div>
+                <div>
+                    <label for="price" class="block text-sm font-medium text-gray-700">Price (NGN)</label>
+                    <input type="number" name="price" id="price" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm" placeholder="e.g., 50000">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- AI Assistant Floating Action Button (FAB) -->
+    <div id="ai-widget-fab">
+        <button id="fab-toggle-button" class="bg-green-600 text-white rounded-full p-4 shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M7 4a3 3 0 016 0v6a3 3 0 11-6 0V4z" />
+                <path fill-rule="evenodd" d="M5.5 8.5A.5.5 0 016 9v1a4 4 0 004 4h.01a4 4 0 004-4V9a.5.5 0 011 0v1a5 5 0 01-4.5 4.975V17h3a.5.5 0 010 1h-7a.5.5 0 010-1h3v-2.025A5 5 0 015 10V9a.5.5 0 01.5-.5z" clip-rule="evenodd" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- AI Assistant Modal/Chat Window -->
+    <div id="ai-widget-modal" class="w-full max-w-sm h-[60vh] bg-white rounded-2xl flex flex-col opacity-0 transform scale-95 -translate-y-4 pointer-events-none">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200">
+            <h3 class="text-lg font-semibold text-gray-800">FarmDepot Assistant</h3>
+            <button id="modal-close-button" class="text-gray-400 hover:text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Chat Log -->
+        <div id="chat-log" class="flex-1 p-4 overflow-y-auto space-y-4">
+            <!-- Messages will be appended here -->
+            <div class="flex justify-start">
+                <div class="bg-gray-100 text-gray-800 rounded-lg rounded-bl-none p-3 max-w-xs">
+                    <p class="text-sm">Hello! How can I help you today? You can say "search for tractors" or "I want to sell my products".</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area / Mic Button -->
+        <div class="p-4 border-t border-gray-200 flex flex-col items-center">
+            <button id="mic-button" class="bg-green-600 text-white rounded-full p-5 shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M7 4a3 3 0 016 0v6a3 3 0 11-6 0V4z" />
+                    <path fill-rule="evenodd" d="M5.5 8.5A.5.5 0 016 9v1a4 4 0 004 4h.01a4 4 0 004-4V9a.5.5 0 011 0v1a5 5 0 01-4.5 4.975V17h3a.5.5 0 010 1h-7a.5.5 0 010-1h3v-2.025A5 5 0 015 10V9a.5.5 0 01.5-.5z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <p id="status-text" class="text-sm text-gray-500 mt-2 h-4">Tap the mic to speak</p>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- CONFIGURATION ---
+            const BACKEND_URL = 'http://127.0.0.1:5000/detect-intent';
+            
+            // --- DOM ELEMENTS ---
+            const fabButton = document.getElementById('fab-toggle-button');
+            const modal = document.getElementById('ai-widget-modal');
+            const closeButton = document.getElementById('modal-close-button');
+            const micButton = document.getElementById('mic-button');
+            const chatLog = document.getElementById('chat-log');
+            const statusText = document.getElementById('status-text');
+
+            // --- STATE MANAGEMENT ---
+            let isModalOpen = false;
+            let sessionId = `fd-session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            let isListening = false;
+            let currentFormAction = null; // Used for form filling state
+
+            // --- SPEECH RECOGNITION & SYNTHESIS SETUP ---
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                console.error("Speech Recognition not supported in this browser.");
+                statusText.textContent = "Voice commands not supported.";
+                micButton.disabled = true;
+                // You could hide the whole widget here if desired.
+            }
+            const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+            if (recognition) {
+                recognition.continuous = false;
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+            }
+
+            // --- UI TOGGLE FUNCTIONS ---
+            const openModal = () => {
+                modal.classList.remove('opacity-0', 'scale-95', '-translate-y-4', 'pointer-events-none');
+                isModalOpen = true;
+            };
+
+            const closeModal = () => {
+                modal.classList.add('opacity-0', 'scale-95', '-translate-y-4', 'pointer-events-none');
+                isModalOpen = false;
+                stopListening();
+            };
+
+            fabButton.addEventListener('click', () => isModalOpen ? closeModal() : openModal());
+            closeButton.addEventListener('click', closeModal);
+
+            // --- CHAT LOG FUNCTIONS ---
+            const addMessageToLog = (text, sender = 'ai') => {
+                const messageDiv = document.createElement('div');
+                const bubbleDiv = document.createElement('div');
+                const textP = document.createElement('p');
+                
+                messageDiv.classList.add('flex', sender === 'ai' ? 'justify-start' : 'justify-end');
+                bubbleDiv.classList.add('rounded-lg', 'p-3', 'max-w-xs', 'text-sm');
+                bubbleDiv.classList.add(sender === 'ai' ? 'bg-gray-100 text-gray-800 rounded-bl-none' : 'bg-green-600 text-white rounded-br-none');
+                
+                textP.textContent = text;
+                
+                bubbleDiv.appendChild(textP);
+                messageDiv.appendChild(bubbleDiv);
+                chatLog.appendChild(messageDiv);
+                
+                // Scroll to the bottom
+                chatLog.scrollTop = chatLog.scrollHeight;
+            };
+
+            // --- CORE AI & SPEECH FUNCTIONS ---
+            const startListening = () => {
+                if (!recognition || isListening) return;
+                try {
+                    recognition.start();
+                    isListening = true;
+                } catch (error) {
+                    console.error("Error starting recognition:", error);
+                    statusText.textContent = "Mic error. Please refresh.";
+                }
+            };
+
+            const stopListening = () => {
+                if (!recognition || !isListening) return;
+                recognition.stop();
+                isListening = false;
+            };
+            
+            const speak = (text) => {
+                 if (!window.speechSynthesis) {
+                    console.warn("Speech Synthesis not supported in this browser.");
+                    return;
+                }
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 1.0;
+                window.speechSynthesis.speak(utterance);
+            };
+
+            micButton.addEventListener('click', () => {
+                if (isListening) {
+                    stopListening();
+                } else {
+                    startListening();
+                }
+            });
+
+            // --- SPEECH RECOGNITION EVENT HANDLERS ---
+            if (recognition) {
+                recognition.onstart = () => {
+                    isListening = true;
+                    statusText.textContent = "Listening...";
+                    micButton.classList.add('mic-listening', 'bg-red-600', 'hover:bg-red-700');
+                };
+
+                recognition.onend = () => {
+                    isListening = false;
+                    statusText.textContent = "Tap the mic to speak";
+                    micButton.classList.remove('mic-listening', 'bg-red-600', 'hover:bg-red-700');
+                };
+                
+                recognition.onerror = (event) => {
+                    console.error("Speech recognition error", event.error);
+                    statusText.textContent = "Sorry, I didn't catch that.";
+                };
+
+                recognition.onresult = async (event) => {
+                    const transcript = event.results[0][0].transcript.trim();
+                    addMessageToLog(transcript, 'user');
+                    statusText.textContent = "Thinking...";
+                    
+                    try {
+                        const response = await fetch(BACKEND_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ text: transcript, sessionId: sessionId })
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`Server error: ${response.statusText}`);
+                        }
+
+                        const aiResponse = await response.json();
+                        handleAiResponse(aiResponse);
+
+                    } catch (error) {
+                        console.error("Error contacting AI backend:", error);
+                        const errorMessage = "I'm having trouble connecting. Please try again later.";
+                        addMessageToLog(errorMessage, 'ai');
+                        speak(errorMessage);
+                    }
+                };
+            }
+
+            // --- AI RESPONSE HANDLER ---
+            const handleAiResponse = (response) => {
+                console.log("AI Response:", response);
+                const { action, fulfillmentText, parameters, customPayload } = response;
+                
+                // Always show and speak the fulfillment text
+                if (fulfillmentText) {
+                    addMessageToLog(fulfillmentText, 'ai');
+                    speak(fulfillmentText);
+                }
+
+                // --- Execute actions based on intent ---
+                switch(action) {
+                    case 'navigate':
+                        if (customPayload && customPayload.url) {
+                            setTimeout(() => {
+                                window.location.href = customPayload.url;
+                            }, 1500); // Wait a moment before redirecting
+                        } else {
+                            console.warn("Navigate action called without a URL in custom payload.");
+                        }
+                        break;
+                    
+                    case 'navigate.form':
+                         // This action is specifically for going to the form, then setting up for the next step.
+                        currentFormAction = 'awaiting_product_title';
+                        if (customPayload && customPayload.url) {
+                            setTimeout(() => {
+                                window.location.href = customPayload.url;
+                            }, 2000);
+                        }
+                        break;
+
+                    case 'search':
+                        if (parameters && parameters.product_name) {
+                            const product = encodeURIComponent(parameters.product_name);
+                            const searchUrl = `https://farmdepot.ng/listings/?q=${product}`;
+                            setTimeout(() => {
+                                window.location.href = searchUrl;
+                            }, 1500);
+                        } else {
+                            console.warn("Search action called without a product name parameter.");
+                        }
+                        break;
+                    
+                    // Add more cases for other actions here...
+                    
+                    default:
+                        console.log(`No specific client-side handler for action: ${action}`);
+                        break;
+                }
+            };
+        });
+    </script>
+
+</body>
+</html>
+
