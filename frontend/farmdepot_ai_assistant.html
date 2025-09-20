@@ -124,7 +124,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- CONFIGURATION ---
-            const BACKEND_URL = 'http://127.0.0.1:5000/detect-intent';
+            // IMPORTANT: Replace this URL with your public ngrok URL from Step 1.
+            const BACKEND_URL = 'https://eb9a692ada87.ngrok-free.app/detect-intent -> http://localhost:50000';
             
             // --- DOM ELEMENTS ---
             const fabButton = document.getElementById('fab-toggle-button');
@@ -253,6 +254,11 @@
                     statusText.textContent = "Thinking...";
                     
                     try {
+                        // Check if the BACKEND_URL has been updated
+                        if (BACKEND_URL.includes('https://eb9a692ada87.ngrok-free.app/detect-intent -> http://localhost:50000')) {
+                             throw new Error("Backend URL not configured. Please update the script.");
+                        }
+
                         const response = await fetch(BACKEND_URL, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -268,7 +274,7 @@
 
                     } catch (error) {
                         console.error("Error contacting AI backend:", error);
-                        const errorMessage = "I'm having trouble connecting. Please try again later.";
+                        const errorMessage = "I'm having trouble connecting. Please check your connection or try again later.";
                         addMessageToLog(errorMessage, 'ai');
                         speak(errorMessage);
                     }
@@ -332,4 +338,3 @@
 
 </body>
 </html>
-
