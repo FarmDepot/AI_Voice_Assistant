@@ -78,7 +78,7 @@
 
     <!-- AI Assistant Floating Action Button (FAB) -->
     <div id="ai-widget-fab">
-        <button id="fab-toggle-button" class="bg-wine-600 text-white rounded-full p-4 shadow-lg hover:bg-wine-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-wine-500">
+        <button id="fab-toggle-button" class="bg-green-600 text-white rounded-full p-4 shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M7 4a3 3 0 016 0v6a3 3 0 11-6 0V4z" />
                 <path fill-rule="evenodd" d="M5.5 8.5A.5.5 0 016 9v1a4 4 0 004 4h.01a4 4 0 004-4V9a.5.5 0 011 0v1a5 5 0 01-4.5 4.975V17h3a.5.5 0 010 1h-7a.5.5 0 010-1h3v-2.025A5 5 0 015 10V9a.5.5 0 01.5-.5z" clip-rule="evenodd" />
@@ -110,7 +110,7 @@
 
         <!-- Input Area / Mic Button -->
         <div class="p-4 border-t border-gray-200 flex flex-col items-center">
-            <button id="mic-button" class="bg-wine-600 text-white rounded-full p-5 shadow-md hover:bg-wine-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-wine-500 transition-all duration-300">
+            <button id="mic-button" class="bg-green-600 text-white rounded-full p-5 shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300">
                  <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M7 4a3 3 0 016 0v6a3 3 0 11-6 0V4z" />
                     <path fill-rule="evenodd" d="M5.5 8.5A.5.5 0 016 9v1a4 4 0 004 4h.01a4 4 0 004-4V9a.5.5 0 011 0v1a5 5 0 01-4.5 4.975V17h3a.5.5 0 010 1h-7a.5.5 0 010-1h3v-2.025A5 5 0 015 10V9a.5.5 0 01.5-.5z" clip-rule="evenodd" />
@@ -180,7 +180,7 @@
                 
                 messageDiv.classList.add('flex', sender === 'ai' ? 'justify-start' : 'justify-end');
                 bubbleDiv.classList.add('rounded-lg', 'p-3', 'max-w-xs', 'text-sm');
-                bubbleDiv.classList.add(sender === 'ai' ? 'bg-gray-100 text-gray-800 rounded-bl-none' : 'bg-wine-600 text-white rounded-br-none');
+                bubbleDiv.classList.add(sender === 'ai' ? 'bg-gray-100 text-gray-800 rounded-bl-none' : 'bg-green-600 text-white rounded-br-none');
                 
                 textP.textContent = text;
                 
