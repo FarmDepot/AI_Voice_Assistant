@@ -124,10 +124,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- CONFIGURATION ---
-            // ##########################################################################
-            // ### IMPORTANT: PASTE YOUR NGROK URL HERE ###
-            // ### It should look like: https://something.ngrok-free.app/detect-intent ###
-            // ##########################################################################
             const BACKEND_URL = 'https://ai-voice-assistant-xllf.onrender.com/detect-intent';
             
             // --- DOM ELEMENTS ---
@@ -142,7 +138,7 @@
             let isModalOpen = false;
             let sessionId = `fd-session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
             let isListening = false;
-            let currentFormAction = null; // Used for form filling state
+            let currentFormAction = null; 
 
             // --- SPEECH RECOGNITION & SYNTHESIS SETUP ---
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -182,7 +178,6 @@
                 
                 messageDiv.classList.add('flex', sender === 'ai' ? 'justify-start' : 'justify-end');
                 
-                // Common classes for all bubbles
                 const baseClasses = ['rounded-lg', 'p-3', 'max-w-xs', 'text-sm'];
                 bubbleDiv.classList.add(...baseClasses);
                 
@@ -260,12 +255,6 @@
                     statusText.textContent = "Thinking...";
                     
                     try {
-                        // *** FIX IS HERE ***
-                        // This now correctly checks for the placeholder text, not your actual URL.
-                        if (BACKEND_URL.includes('PASTE_YOUR_NGROK_HTTPS_URL_HERE')) {
-                             throw new Error("Backend URL not configured. Please open the HTML file and update the BACKEND_URL constant.");
-                        }
-
                         const response = await fetch(BACKEND_URL, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -298,7 +287,14 @@
                     speak(fulfillmentText);
                 }
 
-                switch(action) {
+                // *** THE FINAL FIX IS HERE ***
+                // We are making the action check case-insensitive and adding all the
+                // action names that your Dialogflow agent is sending.
+                const lowerCaseAction = action.toLowerCase();
+
+                switch(lowerCaseAction) {
+                    // This case handles all navigation actions from your Dialogflow.
+                    case 'maps':
                     case 'navigate':
                         if (customPayload && customPayload.url) {
                             setTimeout(() => {
@@ -318,6 +314,7 @@
                         }
                         break;
 
+                    // This case handles the search action from your Dialogflow.
                     case 'search':
                         if (parameters && parameters.product_name) {
                             const product = encodeURIComponent(parameters.product_name);
@@ -331,7 +328,8 @@
                         break;
                     
                     default:
-                        console.log(`No specific client-side handler for action: ${action}`);
+                        // This message is now a warning, not an error.
+                        console.warn(`No specific client-side handler for action: ${action}`);
                         break;
                 }
             };
