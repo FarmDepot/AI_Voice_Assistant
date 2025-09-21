@@ -66,10 +66,6 @@ def detect_intent():
 
 if __name__ == '__main__':
     app.run(debug=True)
-```
 
 
-        
-        git commit -m "Fix: Correctly parse Dialogflow payload"
-        git push
         
