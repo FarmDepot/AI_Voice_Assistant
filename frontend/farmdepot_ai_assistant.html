@@ -186,8 +186,6 @@
                 const baseClasses = ['rounded-lg', 'p-3', 'max-w-xs', 'text-sm'];
                 bubbleDiv.classList.add(...baseClasses);
                 
-                // *** FIX IS HERE ***
-                // Conditional classes are now split into an array and added correctly.
                 const conditionalClasses = (sender === 'ai' ? 'bg-gray-100 text-gray-800 rounded-bl-none' : 'bg-green-600 text-white rounded-br-none').split(' ');
                 bubbleDiv.classList.add(...conditionalClasses);
                 
@@ -262,7 +260,9 @@
                     statusText.textContent = "Thinking...";
                     
                     try {
-                        if (BACKEND_URL.includes('https://7ba67e1e7baa.ngrok-free.app')) {
+                        // *** FIX IS HERE ***
+                        // This now correctly checks for the placeholder text, not your actual URL.
+                        if (BACKEND_URL.includes('PASTE_YOUR_NGROK_HTTPS_URL_HERE')) {
                              throw new Error("Backend URL not configured. Please open the HTML file and update the BACKEND_URL constant.");
                         }
 
