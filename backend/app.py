@@ -43,11 +43,11 @@ def detect_intent():
         custom_payload = {}
         if query_result.fulfillment_messages:
             for message in query_result.fulfillment_messages:
-                # *** THE FIX IS HERE ***
+                # *** THE FINAL FIX IS HERE ***
                 # This correctly handles the modern payload structure from Dialogflow
-                # by treating the payload object like a dictionary.
+                # where the value is a direct string, not an object.
                 if message.payload:
-                    custom_payload = {key: value.string_value for key, value in message.payload.items()}
+                    custom_payload = {key: value for key, value in message.payload.items()}
                     # We only need to find the first payload.
                     if custom_payload:
                         break
@@ -67,5 +67,3 @@ def detect_intent():
 if __name__ == '__main__':
     app.run(debug=True)
 
-
-        
